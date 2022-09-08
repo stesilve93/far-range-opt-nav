@@ -18,9 +18,11 @@ diff_cropped = diff(y0+1:end,x0+1:end); % this is just the overlapping of
 % find the maximum and the minimum coordinates of the difference image
 
 % photoA
+if max(max(diff_cropped)) > 0.5
+
 [y_A,x_A] = find(diff_cropped == max(max(diff_cropped)));
 
-if diff_cropped(y_A,x_A) > 0.2
+
 x_T_A = x_A + x0;
 y_T_A = y_A + y0;
 end
