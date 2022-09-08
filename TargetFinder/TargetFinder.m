@@ -21,46 +21,16 @@ if sky_switch == 1
 end
 [l_sky,h_sky] = size(sky);             
 
-% Cut the two photos ------------------------------------------------------
+% Generate photos with Target
 % FoV
 l = 480;                % px dimension of the photo
 xA = 200;   yA = 250;   % top-left coordinate of the first photo
-xB = 300;   yB = 350;   % top-left coordinate of the second photo
+xB = 250;   yB = 350;   % top-left coordinate of the second photo
+I_A = 1;    I_B = 0.51; % intensity of the Target reflection
+size_A = 7; size_B = 4; % dimension of the Target reflection [px]
 
-% photoA
-photoA = sky(yA:yA+l-1, xA:xA+l-1); 
+[photoA,photoB,pos_T_sky,pos_T] = generate_photos_withT(sky,l,xA,yA,xB,yB,I_A,I_B,size_A,size_B);
 
-% photoB
-photoB = sky(yB:yB+l-1, xB:xB+l-1);
-
-% Add the reflection of the satellite -------------------------------------
-% generate image of the satellite reflection
-sat_photo_A = zeros(21,21);
-I_A = 0.7
-sat_photo_A(7:13,7:13) = I_A;
-sat_photo_A = conv2(sat_photo_A,fspecial('gaussian', 15,1),'same');
-
-sat_photo_B = zeros(21,21);
-I_B = 0.7
-sat_photo_B(7:13,7:13) = I_B;
-sat_photo_B = conv2(sat_photo_B,fspecial('gaussian', 15,1),'same');
-
-% add target to random position
-frame = 20;     %the target will not appear in the extreme edge of the photo
-pos_sat_xA_sky = randi([xA+frame, xA+l-frame]); 
-pos_sat_yA_sky = randi([yA+frame, yA+l-frame]); 
-pos_sat_xB_sky = randi([xB+frame, xA+l-frame]); 
-pos_sat_yB_sky = randi([yB+frame, yA+l-frame]);
-
-% coordinates of the target in the photos coordinate system
-pos_sat_xA = pos_sat_xA_sky-xA;
-pos_sat_yA = pos_sat_yA_sky-yA;
-pos_sat_xB = pos_sat_xB_sky-xB;
-pos_sat_yB = pos_sat_yB_sky-yB;
-
-% add Target reflection
-photoA(pos_sat_yA-10:pos_sat_yA+10,pos_sat_xA-10:pos_sat_xA+10) = photoA(pos_sat_yA-10:pos_sat_yA+10,pos_sat_xA-10:pos_sat_xA+10) + sat_photo_A;
-photoB(pos_sat_yB-10:pos_sat_yB+10,pos_sat_xB-10:pos_sat_xB+10) = photoA(pos_sat_yB-10:pos_sat_yB+10,pos_sat_xB-10:pos_sat_xB+10) + sat_photo_B;
 
 %% [ Target search ]
 
@@ -111,20 +81,20 @@ rectangle('Position',[xB,yB,l,l],'LineWidth',2,'EdgeColor','b'); hold on
 title('FoV of the camera');
 % plot stars
 figure(1)
-plot(pos_sat_xA_sky,pos_sat_yA_sky,'ro','LineWidth',2); hold on
-plot(pos_sat_xB_sky,pos_sat_yB_sky,'bo','LineWidth',2); hold on
+plot(pos_T_sky.xA,pos_T_sky.yA,'ro','LineWidth',2); hold on
+plot(pos_T_sky.xB,pos_T_sky.yB,'bo','LineWidth',2); hold on
 
 % show photos of the sky---------------------------------------------------
 figure(2)
 imshow(photoA); hold on
 rectangle('Position',[1,1,l-1,l-1],'LineWidth',2,'EdgeColor','r');
-plot(pos_sat_xA,pos_sat_yA,'ro','LineWidth',2)
+plot(pos_T.xA,pos_T.yA,'ro','LineWidth',2)
 title('photo A');
 
 figure(3)
 imshow(photoB); hold on
 rectangle('Position',[1,1,l-1,l-1],'LineWidth',2,'EdgeColor','b');
-plot(pos_sat_xB,pos_sat_yB,'bo','LineWidth',2)
+plot(pos_T.xB,pos_T.yB,'bo','LineWidth',2)
 title('photo B');
 
 % show corr matrix --------------------------------------------------------
