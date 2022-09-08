@@ -9,11 +9,11 @@ photoB = sky(yB:yB+l-1, xB:xB+l-1);
 % Add the reflection of the satellite -------------------------------------
 % generate image of the satellite reflection
 sat_photo_A = zeros(21,21);
-sat_photo_A(7:7+size_A,7:7+size_A) = I_A;
+sat_photo_A(11-round(size_A/2):11+round(size_A/2),11-round(size_A/2):11+round(size_A/2)) = I_A;
 sat_photo_A = conv2(sat_photo_A,fspecial('gaussian', round(15),1),'same');
 
 sat_photo_B = zeros(21,21);
-sat_photo_B(7:7+size_B,7:7+size_B) = I_B;
+sat_photo_B(11-round(size_B/2):11+round(size_B/2),11-round(size_B/2):11+round(size_B/2)) = I_B;
 sat_photo_B = conv2(sat_photo_B,fspecial('gaussian', round(15),1),'same');
 
 % add target to random position

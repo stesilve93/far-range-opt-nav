@@ -2,6 +2,7 @@
 clear all
 close all
 
+showplot = 0;
 %% [ Generate two photos of the sky with the target's reflection ]
 
 % Upload sky image --------------------------------------------------------
@@ -26,8 +27,8 @@ end
 l = 480;                % px dimension of the photo
 xA = 200;   yA = 250;   % top-left coordinate of the first photo
 xB = 250;   yB = 350;   % top-left coordinate of the second photo
-I_A = 1;    I_B = 0.51; % intensity of the Target reflection
-size_A = 7; size_B = 4; % dimension of the Target reflection [px]
+I_A = 1;    I_B = 1; % intensity of the Target reflection
+size_A = 5; size_B = 5; % dimension of the Target reflection [px]
 
 [photoA,photoB,pos_T_sky,pos_T] = generate_photos_withT(sky,l,xA,yA,xB,yB,I_A,I_B,size_A,size_B);
 
@@ -55,8 +56,25 @@ toc
 [x0,y0] = find_imagecoord(corr_mat, conv_len);
 
 % compute target coordinate in the two photos
-[x_T_A,y_T_A,x_T_B,y_T_B,diff_cropped] = find_Tcoord(x0,y0,photoA,photoB);
+[pos_T_found,result,diff_cropped] = find_Tcoord(x0,y0,photoA,photoB);
 time = toc;
+
+error_t = norm([pos_T_found.xB,pos_T_found.yB] - [pos_T.xB,pos_T.yB]);
+error_tm1 = norm([pos_T_found.xA,pos_T_found.yA] - [pos_T.xA,pos_T.yA]);
+
+% message
+if result == 0
+    MSG = 'No Target Found';
+elseif result == 1
+    MSG = ['Target found at t. Pixel error is ', num2str(error_t)];
+
+elseif result == 2
+     MSG = ['Target found at t-1 and t. Pixel errors are ', num2str(error_t), ' and ',num2str(error_tm1) ];
+end
+
+disp(MSG);
+
+
 
 %% [ Line of sight ]
 
@@ -68,10 +86,12 @@ x_sens = 0.01;      % x dimension of the sensor [m] (assume square for now)
 [FoV_x,FoV_y] = cameraFOV(f,x_sens); 
 
 %compute LoS
-[alpha_x,alpha_y] = LOS_fromcoord(f, x_sens, l, x_T_B, y_T_B); 
+[alpha_x,alpha_y] = LOS_fromcoord(f, x_sens, l, pos_T_found.xB, pos_T_found.yB); 
 
 
 %% [ Plots ]
+
+if showplot == 1
 
 % show sky with FoV--------------------------------------------------------
 figure(1)
@@ -88,13 +108,13 @@ plot(pos_T_sky.xB,pos_T_sky.yB,'bo','LineWidth',2); hold on
 figure(2)
 imshow(photoA); hold on
 rectangle('Position',[1,1,l-1,l-1],'LineWidth',2,'EdgeColor','r');
-plot(pos_T.xA,pos_T.yA,'ro','LineWidth',2)
+plot(pos_T.xA,pos_T.yA,'ro','LineWidth',2);
 title('photo A');
 
 figure(3)
 imshow(photoB); hold on
 rectangle('Position',[1,1,l-1,l-1],'LineWidth',2,'EdgeColor','b');
-plot(pos_T.xB,pos_T.yB,'bo','LineWidth',2)
+plot(pos_T.xB,pos_T.yB,'bo','LineWidth',2);
 title('photo B');
 
 % show corr matrix --------------------------------------------------------
@@ -112,15 +132,15 @@ title('Difference between photoA and photoB')
 figure(6)
 imshow(photoA); hold on
 rectangle('Position',[1,1,l-1,l-1],'LineWidth',2,'EdgeColor','r'); hold on
-if diff_cropped(y_T_A-y0,x_T_A-x0) > 0.2
-plot(x_T_A,y_T_A,'ro', 'LineWidth',2); 
+if result == 2
+plot(pos_T_found.xA,pos_T_found.yA,'ro', 'LineWidth',2); 
 end
 
 figure(7)
 imshow(photoB); hold on
-plot(x_T_B,y_T_B,'bo', 'LineWidth',2); 
+plot(pos_T_found.xB,pos_T_found.yB,'bo', 'LineWidth',2); 
 rectangle('Position',[1,1,l-1,l-1],'LineWidth',2,'EdgeColor','b');
 
 
-
+end
 
