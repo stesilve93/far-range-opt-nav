@@ -1,4 +1,4 @@
-function [pos_T_found,result,diff_cropped] = find_Tcoord(x0,y0,photoA,photoB)
+function [Tcoord,result,diff_cropped] = find_Tcoord(x0,y0,photoA,photoB)
 
 %--------------------------------------------------------------------------
 % Compute the difference image and find the coordinate of the two Target
@@ -15,41 +15,40 @@ diff_cropped = diff(y0+1:end,x0+1:end); % this is just the overlapping of
                                         % the two photos (does not show the 
                                         % border stars
 
-pos_T_found.xA = NaN;
-pos_T_found.yA = NaN;
-pos_T_found.xB = NaN;
-pos_T_found.yB = NaN;
-result = 0;
+Tcoord.xA = NaN;
+Tcoord.yA = NaN;
+Tcoord.xB = NaN;
+Tcoord.yB = NaN;
+result = [0 0];
+
+
+% find the Target in the first photo (if the condition is satisfied)
+if max(max(diff_cropped(10:end-10,10:end-10))) > 0.2
+    result = result + [1 0]; %Target found in second photo
+    [y_A,x_A] = find(diff_cropped == max(max(diff_cropped(10:end-10,10:end-10))));
+
+    y_A = round(mean(y_A));
+    x_A = round(mean(x_A));
+
+    Tcoord.xA = x_A + x0;
+    Tcoord.yA = y_A + y0;
+end
 
 % find the Target in the second photo
-if min(min(diff_cropped))<-0.2
-    result = 1; %Target is found
-    [y_B,x_B] = find(diff_cropped == min(min(diff_cropped)));
+if min(min(diff_cropped(10:end-10,10:end-10)))<-0.2
+    result = result + [0 1]; %Target is found
+    [y_B,x_B] = find(diff_cropped == min(min(diff_cropped(10:end-10,10:end-10))));
     
     y_B = round(mean(y_B));
     x_B = round(mean(x_B));
     
-    pos_T_found.xB = x_B;
-    pos_T_found.yB = y_B;
-
-
-    % find the Target in the first photo (if the condition is satisfied)
-    if max(max(diff_cropped)) > 0.2
-        result = 2; %Target found in both photos
-    
-        [y_A,x_A] = find(diff_cropped == max(max(diff_cropped)));
-    
-        y_A = round(mean(y_A));
-        x_A = round(mean(x_A));
-    
-        pos_T_found.xA = x_A + x0;
-        pos_T_found.yA = y_A + y0;
-    end
+    Tcoord.xB = x_B;
+    Tcoord.yB = y_B;
 end
-                                        
+                                
 
 
-    
+
 
 
 
