@@ -26,7 +26,7 @@ end
 l = 480;                % px dimension of the photo
 xA = 200;   yA = 250;   % top-left coordinate of the first photo
 xB = 300;   yB = 450;   % top-left coordinate of the second photo
-I_A = 1;    I_B = 1; % intensity of the Target reflection
+I_A = 1;    I_B = 1;    % intensity of the Target reflection
 size_A = 5; size_B = 3; % dimension of the Target reflection [px]
 
 [photoA,photoB,Tcoord_sky,Tcoord_real] = generate_photos_withT(sky,l,xA,yA,xB,yB,I_A,I_B,size_A,size_B);
