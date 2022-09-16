@@ -9,13 +9,12 @@ T_photo = conv2(T_photo,fspecial('gaussian', round(15),1),'same');
 
 
 % trajectory of the moving target in the sky
-Tcoordsky_real = [10*t; 1000-10*t];
+Tcoordsky_real = [4*t+100; 1000-4*t];
 
 % paste the target reflection on the sky
-sky(Tcoordsky_real(2)-round(size_T/2):Tcoordsky_real(2)+round(size_T/2),Tcoordsky_real(1)...
-    -round(size_T/2):Tcoordsky_real(1)+round(size_T/2)) = sky(Tcoordsky_real(2)-...
-    round(size_T/2):Tcoordsky_real(2)+round(size_T/2),Tcoordsky_real(1)-...
-    round(size_T/2):Tcoordsky_real(1)+round(size_T/2)) + T_photo; 
+sky(Tcoordsky_real(2)-10:Tcoordsky_real(2)+10,Tcoordsky_real(1)...
+    -10:Tcoordsky_real(1)+10) = sky(Tcoordsky_real(2)-10:Tcoordsky_real(2)+10,Tcoordsky_real(1)...
+    -10:Tcoordsky_real(1)+10) + T_photo; 
 
 
 
