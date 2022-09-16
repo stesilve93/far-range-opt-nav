@@ -18,10 +18,10 @@ T_photo_B = conv2(T_photo_B,fspecial('gaussian', round(15),1),'same');
 
 % add target to random position
 frame = 20;     %the target will not appear in the extreme edge of the photo
-Tcoord_sky.xA = randi([xA+frame, xA+l-frame]); 
-Tcoord_sky.yA = randi([yA+frame, yA+l-frame]); 
-Tcoord_sky.xB = randi([xB+frame, xA+l-frame]); 
-Tcoord_sky.yB = randi([yB+frame, yA+l-frame]);
+Tcoord_sky.xA = randi([max(xA,xB)+frame, min(xA,xB)+l-frame]); 
+Tcoord_sky.yA = randi([max(yA,yB)+frame, min(yA,yB)+l-frame]); 
+Tcoord_sky.xB = randi([max(xA,xB)+frame, min(xA,xB)+l-frame]); 
+Tcoord_sky.yB = randi([max(yA,yB)+frame, min(yA,yB)+l-frame]);
 
 % coordinates of the target in the photos coordinate system
 Tcoord_real.xA = Tcoord_sky.xA-xA;

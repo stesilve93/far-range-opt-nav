@@ -23,37 +23,59 @@ end
 size_T = 5;     % pixel size
 I_T = 1;        % intensity
 
-% setting of the photo
+% setting of the photos
 l = 480;
 
 % time vector of the photos
-t = 1:1:800;
+t = 1:1:100;
 
 % save photos of the sky with moving Target
 sky_container = zeros(size(sky,1),size(sky,2),size(t,2));
-[sky_container(:,:,1),~] = Paste_moving_T(sky,t(1),I_T,size_T);
+
 
 
 %% Scan setting 
 
 Tcoordsky_real = zeros(2,size(t,2));
-step = 100;     % step between two photos (coordinate of the top left corner)
+step_x = 100;     % pixel step between two photos (coordinate of the top left corner)
+step_y = 200;     % pixel step between two photos (coordinate of the top left corner)
 
 % top-left corner coordinates
-y_vec = 1:step:(size(sky,1)-l);
-x_vec = 1:step:(size(sky,2)-(l+step));
-
-k = 0;
+y_vec = 1:step_y:(size(sky,1)-l);
+x_vec = 1:step_x:(size(sky,2)-l);
 
 
-for n = 1:size(y_vec,2)-1
+
+
+
+
+
+
+k = 1;
+
+[sky_container(:,:,1),Tcoordsky_real(:,1)] = Paste_moving_T(sky,t(1),I_T,size_T);
+            
+xA = x_vec(1);
+yA = y_vec(1);
+ % photoA
+photoB = sky_container(yA:yA+l-1,xA:xA+l-1,1);
+figure(1)
+            imshow(sky_container(:,:,1)); hold on
+           
+            rectangle('Position',[xA,yA,l,l],'LineWidth',2,'EdgeColor','b'); hold on
+  
+        
+            F(k) = getframe(gcf) ;
+            drawnow
+
+for n = 1:size(y_vec,2)
     
     if rem(n,2) == 1
         for m = 1:size(x_vec,2)-1
             
             k = k+1;
             
-            [sky_container(:,:,m+1),Tcoordsky_real(:,m+1)] = Paste_moving_T(sky,t(k),I_T,size_T);
+            [sky_container(:,:,k),Tcoordsky_real(:,k)] = Paste_moving_T(sky,t(k),I_T,size_T);
             
             xA = x_vec(m);
             yA = y_vec(n);
@@ -62,27 +84,35 @@ for n = 1:size(y_vec,2)-1
             
     
             % photoA
-            photoA = sky_container(yA:yA+l-1,xA:xA+l-1,m); 
+            photoA = sky_container(yA:yA+l-1,xA:xA+l-1,k-1); 
+           
             
             % photoB
-            photoB = sky_container(yB:yB+l-1,xB:xB+l-1,m+1);
+            photoB = sky_container(yB:yB+l-1,xB:xB+l-1,k);
     
-            [result,Tcoord,plots] = TargetFinder(photoA,photoB);
-    
-            if result ~= [0 0]
-                break
-            end
+           
 
             figure(1)
-            imshow(sky_container(:,:,m+1)); hold on
-            if ~isnan(Tcoord.xB)
-            plot(Tcoord.xB+xB,Tcoord.yB+yB,'bo','LineWidth',2); hold on
-            end
+            imshow(sky_container(:,:,k)); hold on
+            plot(Tcoordsky_real(1,k-1),Tcoordsky_real(2,k-1),'ro','LineWidth',2); hold on
+            plot(Tcoordsky_real(1,k),Tcoordsky_real(2,k),'bo','LineWidth',2); hold on
+            
             rectangle('Position',[xA,yA,l,l],'LineWidth',2,'EdgeColor','r'); hold on
             rectangle('Position',[xB,yB,l,l],'LineWidth',2,'EdgeColor','b');
         
             F(k) = getframe(gcf) ;
             drawnow
+
+            [result,Tcoord,plots] = TargetFinder(photoA,photoB);
+            if ~isnan(Tcoord.xB)
+                figure(1)
+            plot(Tcoord.xB+xB,Tcoord.yB+yB,'g*','LineWidth',2); hold on
+            end
+             F(k) = getframe(gcf) ;
+            drawnow
+             if result ~= [0 0]
+                break
+            end
 
            
         end
@@ -91,7 +121,7 @@ for n = 1:size(y_vec,2)-1
             
                 k = k+1;
             
-            [sky_container(:,:,m+1),Tcoordsky_real(:,m+1)] = Paste_moving_T(sky,t(k),I_T,size_T);
+            [sky_container(:,:,k),Tcoordsky_real(:,k)] = Paste_moving_T(sky,t(k),I_T,size_T);
             
             flipped_x_vec = flip(x_vec);
             xA = flipped_x_vec(m);
@@ -101,27 +131,37 @@ for n = 1:size(y_vec,2)-1
             
     
             % photoA
-            photoB = sky_container(yA:yA+l-1,xA:xA+l-1,m); 
+            photoA = sky_container(yA:yA+l-1,xA:xA+l-1,k-1); 
             
             % photoB
-            photoA = sky_container(yB:yB+l-1,xB:xB+l-1,m+1);
+            photoB = sky_container(yB:yB+l-1,xB:xB+l-1,k);
     
-            [result,Tcoord,plots] = TargetFinder(photoA,photoB);
+           
     
-            if result ~= [0 0]
-                break
-            end
+    
+        
 
             figure(1)
-            imshow(sky_container(:,:,m+1)); hold on
-            if ~isnan(Tcoord.xB)
-            plot(Tcoord.xB+xB,Tcoord.yB+yB,'bo','LineWidth',2); hold on
-            end
+            imshow(sky_container(:,:,k)); hold on
+            plot(Tcoordsky_real(1,k-1),Tcoordsky_real(2,k-1),'ro','LineWidth',2); hold on
+            plot(Tcoordsky_real(1,k),Tcoordsky_real(2,k),'bo','LineWidth',2); hold on
+            
             rectangle('Position',[xA,yA,l,l],'LineWidth',2,'EdgeColor','r'); hold on
             rectangle('Position',[xB,yB,l,l],'LineWidth',2,'EdgeColor','b');
            
             F(k) = getframe(gcf) ;
             drawnow
+
+            [result,Tcoord,plots] = TargetFinder(photoA,photoB);
+            if ~isnan(Tcoord.xB)
+                figure(1)
+            plot(Tcoord.xB+xB,Tcoord.yB+yB,'g*','LineWidth',2); hold on
+            end
+            F(k) = getframe(gcf) ;
+            drawnow
+                if result ~= [0 0]
+                break
+            end
             end
     end
      
@@ -162,6 +202,5 @@ plot(Tcoord.xA,Tcoord.yA,'ro','LineWidth',2);
 figure(3)
 imshow(photoB); hold on
 plot(Tcoord.xB,Tcoord.yB,'bo','LineWidth',2);
-
 
 

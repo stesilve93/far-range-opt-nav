@@ -2,7 +2,7 @@
 clear all
 close all
 
-showplot = 0;
+showplot = 1;
 %% [ Generate two photos of the sky with the target's reflection ]
 
 % Upload sky image --------------------------------------------------------
@@ -25,7 +25,7 @@ end
 % FoV
 l = 480;                % px dimension of the photo
 xA = 200;   yA = 250;   % top-left coordinate of the first photo
-xB = 300;   yB = 450;   % top-left coordinate of the second photo
+xB = 150;   yB = 300;   % top-left coordinate of the second photo
 I_A = 1;    I_B = 1;    % intensity of the Target reflection
 size_A = 5; size_B = 3; % dimension of the Target reflection [px]
 
