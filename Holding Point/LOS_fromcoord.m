@@ -1,4 +1,4 @@
-function [FOV,LOS] = LOS_fromcoord(f, x_sens, l, Tcoord)
+function [FOV,LOS] = LOS_fromcoord(f, x_sens, l, xT,yT)
 %--------------------------------------------------------------------------
 % compute the LoS given the camera characteristics and the image coordinate
 %--------------------------------------------------------------------------
@@ -11,8 +11,8 @@ FOV.x = rad2deg(2* atan(0.5*x_sens/f));
 pix_dim = x_sens/l;
 
 % compute coordinate distance
-x_sat_dim = Tcoord.xB * pix_dim;
-y_sat_dim = Tcoord.yB * pix_dim;
+x_sat_dim = xT * pix_dim;
+y_sat_dim = yT * pix_dim;
 
 % compute coordinate from the central point
 x_sat_cam = x_sat_dim - x_sens/2;

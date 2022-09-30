@@ -5,11 +5,10 @@ function [sky] = synthetic_sky(hsize, sigma, dim_x, dim_y)
 %           - sigma: stdev of the gaussian PSF
 
 
-if nargin<1
-    hsize = 15;
-    sigma = 3;
-end
+N = rand(dim_y,dim_x)*0.05;       % noise layer 
+B = 0.01*ones(dim_y,dim_x);     % background gray image
+S = conv2((rand([dim_y,dim_x])>0.9999),fspecial('gaussian', hsize,sigma),'same');   % stars
 
 % synthetic image
-sky = conv2((rand([dim_y,dim_x])>0.9999),fspecial('gaussian', hsize,sigma),'same') + (rand(dim_y,dim_x)*0.01);
+sky = N+B+S;
 sky = sky/max(max(sky));
