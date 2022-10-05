@@ -7,7 +7,7 @@ clear all
 f = 0.05;           % focal length [m]
 x_sens = 0.01;      % x dimension of the sensor [m] (assume square for now)
 l = 480;
-alpha_camera = deg2rad(0);  % angle between direction of camera and velocity
+alpha_camera = deg2rad(4);  % angle between direction of camera and velocity
 
 
 % ORBIT -------------------------------------------------------------------
@@ -62,12 +62,15 @@ I_vec = 0.5+0.5*sin(0.1*t_vec);
 Tcoord_real.xT = round(l/2);    % if same orbit and camera is pointing velocity
 Tcoord_real.yT = round((f*tan(LOS_T) + x_sens/2)*l/x_sens); % compute the pixel position of the Target
 T_photo = zeros(21,21);
+
 if size_vec(1)==0
 T_photo(11-round(size_vec(1)/2):11+round((1)/2),11-round(size_vec(1)/2):11+round(size_vec(1)/2)) = 0;
+elseif size_vec(1)==1
+    T_photo(11,11) = I_vec(1);
 else
     T_photo(11-round(size_vec(1)/2):11+round((1)/2),11-round(size_vec(1)/2):11+round(size_vec(1)/2)) = I_vec(1);
 end
-    T_photo = conv2(T_photo,fspecial('gaussian', round(15),1),'same');
+    T_photo = conv2(T_photo,fspecial('gaussian', round(15),3),'same');
 
 % HOLDING POINT SIMULATION ------------------------------------------------
 % first frame
@@ -78,14 +81,14 @@ photoB(Tcoord_real.yT-10:Tcoord_real.yT+10,Tcoord_real.xT-10:Tcoord_real.xT+10) 
 
 
 figure()
-photoB_frame = insertText(photoB,[Tcoord_real.xT+20,Tcoord_real.yT-20],['[',num2str(LOS.x,'%.2f'),';', num2str(LOS.y,'%.2f'),'] deg']);
-imshow(photoB_frame); hold on
+% photoB_frame = insertText(photoB,[Tcoord_real.xT+20,Tcoord_real.yT-20],['[',num2str(LOS.x,'%.2f'),';', num2str(LOS.y,'%.2f'),'] deg']);
+imshow(photoB); hold on
 
 F(1) = getframe(gcf); % save frame for video 
 drawnow;
 
 coord_mat = zeros(2,size(fov_vec,2));   % container for T coordinates
-for n = 2:100
+for n = 2:200
     
     % update new photos
     photoA = photoB;
@@ -94,11 +97,14 @@ for n = 2:100
     % add Target reflection
     T_photo = zeros(21,21);
     if size_vec(n) ==0
-    T_photo(11-round(size_vec(n)/2):11+round(size_vec(n)/2),11-round(size_vec(n)/2):11+round(size_vec(n)/2)) = 0;
+        T_photo(11-round(size_vec(n)/2):11+round(size_vec(n)/2),11-round(size_vec(n)/2):11+round(size_vec(n)/2)) = 0;
+    elseif size_vec(n) ==1
+        T_photo(11,11) = I_vec(n);
     else
         T_photo(11-round(size_vec(n)/2):11+round(size_vec(n)/2),11-round(size_vec(n)/2):11+round(size_vec(n)/2)) = I_vec(n);
+        T_photo = conv2(T_photo,fspecial('gaussian', round(size_vec(n)),3),'same');
+        T_photo = T_photo/max(max(T_photo))*I_vec(n);
     end
-    T_photo = conv2(T_photo,fspecial('gaussian', round(15),1),'same');
     photoB(Tcoord_real.yT-10:Tcoord_real.yT+10,Tcoord_real.xT-10:Tcoord_real.xT+10) = photoB(Tcoord_real.yT-10:Tcoord_real.yT+10,Tcoord_real.xT-10:Tcoord_real.xT+10) + T_photo;
 
     % search for target coordinates

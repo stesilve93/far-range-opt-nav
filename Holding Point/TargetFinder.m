@@ -4,7 +4,7 @@ function [result,Tcoord,plots] = TargetFinder(photoA,photoB)
 % Set variables -----------------------------------------------------------
 % set preprocessing variables
 set_prepro.thres = 0.4;    % threshold filter
-set_prepro.med = 3;        % dimension of the median filter
+set_prepro.med = 1;        % dimension of the median filter
 % set the dimension of the filter
 conv_len = size(photoA,1);
 %--------------------------------------------------------------------------
